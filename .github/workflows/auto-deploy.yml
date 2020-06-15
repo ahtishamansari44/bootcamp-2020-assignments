@@ -1,0 +1,31 @@
+name: Jekyll site CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build the site in the jekyll/builder container
+      run: |
+        docker run \
+        -v ${{ github.workspace }}:/srv/jekyll -v ${{ github.workspace }}/_site:/srv/jekyll/_site \
+        jekyll/builder:latest /bin/bash -c "chmod 777 /srv/jekyll && jekyll build --future"
+
+    - name: Installing Node
+      uses: actions/setup-node@v2-beta
+      with:
+        node-version: 12
+    
+    - name: Instaling Surge
+      run: npm install --global surge
+    - name: Deploy using surge
+      run: surge ./assignment-no-1/ assignmentno-1.surge.sh --token "ae88f860237387898ffdbb49dd3a6a5c"
+          
